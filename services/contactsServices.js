@@ -1,50 +1,16 @@
-import fs from "fs/promises";
-import { nanoid } from "nanoid";
-import path from "path";
+import Contact from "../models/Contact.js";
 
-const contactsPath = path.resolve("db", "contacts.json");
-const updateContact = (contacts) =>
-  fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+export const listContacts = () => Contact.find();
 
-export async function listContacts() {
-  const data = await fs.readFile(contactsPath, "utf-8");
-  return JSON.parse(data);
-}
+export const addContact = (data) => Contact.create(data);
 
-export async function getContactById(contactId) {
-  const data = await listContacts();
-  return data.find((contact) => contact.id === contactId) || null;
-}
+export const getContactById = async (contactId) => {
+  const data = await Contact.findById({_id: contactId});
+  return data;
+};
 
-export async function removeContact(contactId) {
-  const data = await listContacts();
-  const index = data.findIndex((contact) => contact.id === contactId);
-  if (index === -1) {
-    return null;
-  }
-  const [deletedContact] = data.splice(index, 1);
-  await updateContact(data);
-  return deletedContact;
-}
+export const updateContactById = async (id, data) => Contact.findByIdAndUpdate(id, data);
 
-export async function addContact(data) {
-  const contacts = await listContacts();
-  const newContact = {
-    id: nanoid(),
-    ...data,
-  };
-  contacts.push(newContact);
-  await updateContact(contacts);
-  return newContact;
-}
+export const removeContact = async (contactId) => Contact.findByIdAndDelete(contactId);
 
-export async function updateContactById(id, data) {
-  const contacts = await listContacts();
-  const index = contacts.findIndex((contact) => contact.id === id);
-  if (index === -1) {
-    return null;
-  }
-  contacts[index] = { ...contacts[index], ...data };
-  await updateContact(contacts);
-  return contacts[index];
-}
+export const updateStatusById = async (contactId, data) => Contact.findByIdAndUpdate(contactId, data)
