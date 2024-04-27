@@ -1,6 +1,6 @@
 import express from "express";
 
-import { createContactSchema, updateContactSchema } from "../schemas/contactsSchemas.js"
+import { createContactSchema, updateContactSchema, updateStatusSchema } from "../schemas/contactsSchemas.js"
 import contactsControllers from "../controllers/contactsControllers.js";
 import validateBody from "../helpers/validateBody.js"
 import isEmptyBody from "../middlewares/isEmptyBody.js";
@@ -18,6 +18,6 @@ contactsRouter.post("/", isEmptyBody, validateBody(createContactSchema), contact
 
 contactsRouter.put("/:id", isValidId, isEmptyBody, validateBody(updateContactSchema), contactsControllers.updateContact);
 
-contactsRouter.put("/:id/favorite", isValidId, isEmptyBody, contactsControllers.updateStatusContact);
+contactsRouter.put("/:id/favorite", isValidId, isEmptyBody, validateBody(updateStatusSchema), contactsControllers.updateStatusContact);
 
 export default contactsRouter;
