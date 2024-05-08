@@ -1,10 +1,11 @@
-import { Schema, model } from "mongoose"
-import {handleSaveError, setUpdateSetting} from "./hooks.js"
+import { Schema, model } from "mongoose";
+import { handleSaveError, setUpdateSetting } from "./hooks.js";
 
-const contactSchema = new Schema({
+const contactSchema = new Schema(
+  {
     name: {
       type: String,
-      required: [true, 'Set name for contact'],
+      required: [true, "Set name for contact"],
     },
     email: {
       type: String,
@@ -16,15 +17,20 @@ const contactSchema = new Schema({
       type: Boolean,
       default: false,
     },
-  }, {versionKey: false, timestamps:true}
-)
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
+  },
+  { versionKey: false, timestamps: true }
+);
 
-contactSchema.pre("findOneAndUpdate", setUpdateSetting)
+contactSchema.pre("findOneAndUpdate", setUpdateSetting);
 
-contactSchema.post("save", handleSaveError)
+contactSchema.post("save", handleSaveError);
 
-contactSchema.post("findOneAndUpdate", handleSaveError)
+contactSchema.post("findOneAndUpdate", handleSaveError);
 
-const Contact = model("contact", contactSchema)
+const Contact = model("contact", contactSchema);
 
-export default Contact
+export default Contact;
