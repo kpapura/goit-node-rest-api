@@ -1,7 +1,7 @@
 import express from "express";
 
 import authControllers from "../controllers/authControllers.js"
-import {userSigninSchema, userSignupSchema, userSubscriptionSchema } from "../schemas/authSchemas.js"
+import {userEmailSchema, userSigninSchema, userSignupSchema, userSubscriptionSchema } from "../schemas/authSchemas.js"
 import validateBody from "../helpers/validateBody.js"
 import isEmptyBody from "../middlewares/isEmptyBody.js";
 import authenticate from "../middlewares/authenticate.js";
@@ -13,6 +13,8 @@ const authRouter = express.Router()
 // upload.array("poster", 8)
 
 authRouter.post("/users/register", upload.single("avatarURL"), isEmptyBody, validateBody(userSignupSchema), authControllers.signup)
+authRouter.get("/users/verify/:verificationToken", authControllers.verify)
+authRouter.get("/users/verify", isEmptyBody, validateBody(userEmailSchema), authControllers.resendMail)
 authRouter.post("/users/login", isEmptyBody, validateBody(userSigninSchema), authControllers.signin)
 authRouter.get("/users/current", authenticate, authControllers.getCurrent)
 authRouter.get("/users/logout", authenticate, authControllers.logout)
