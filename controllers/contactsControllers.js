@@ -42,7 +42,8 @@ export const deleteContact = async (req, res) => {
 
 export const createContact = async (req, res) => {
   const { _id: owner } = req.user;
-  const newContact = await contactsService.addContact({ ...req.body, owner });
+
+  const newContact = await contactsService.addContact({...req.body, owner});
   res.status(201).json(newContact);
 };
 

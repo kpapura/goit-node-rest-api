@@ -1,8 +1,17 @@
+import jwt from "jsonwebtoken";
+import gravatar from 'gravatar'
+import fs from "fs/promises";
+import path from "path";
+
+// import cloudinary from "../helpers/cloudinary.js"
+
 import HttpError from "../helpers/HttpError.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import * as authServices from "../services/authServices.js";
-import jwt from "jsonwebtoken";
 import { typesOfSubscription } from "../constants/user-constants.js";
+import {resizeImages} from "../helpers/resizeImages.js"
+
+const avatarsPath = path.resolve("public", "avatars")
 
 const { JWT_SECRET } = process.env;
 
@@ -13,13 +22,17 @@ const signup = async (req, res) => {
   if (user) {
     throw HttpError(409, "Email in use");
   }
-
-  const newUser = await authServices.signup(req.body);
+    // const {url: avatar} = await cloudinary.uploader.upload(req.file.path, { folder: "avatars" });
+  // await fs.unlink(req.file.path);
+  
+  const avatarURL = gravatar.url(req.body.email)
+  const newUser = await authServices.signup({ ...req.body, avatarURL });
+  
   res.status(201).json({
     email: newUser.email,
     subscription: newUser.subscription,
   });
-};
+}; 
 
 const signin = async (req, res) => {
   const { email, password } = req.body;
@@ -38,8 +51,10 @@ const signin = async (req, res) => {
 
   const { _id: id } = user;
   const payload = { id };
+
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "23h" });
   await authServices.saveToken({ _id: id }, { token });
+  
   res.json({
     token,
     user: {
@@ -77,10 +92,30 @@ const changeUserSubscription = async (req, res) => {
   }
   res.json(changedSubscription);
 };
+
+const changeUserAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const { path: oldPath, filename } = req.file;
+  const newPath = path.join(avatarsPath, filename);
+  await resizeImages(oldPath,newPath)
+  await fs.rename(oldPath, newPath);
+
+  const avatarURL = path.join("avatars", filename)
+
+  const changedAvatar = await authServices.changeAvatar({ _id }, {avatarURL});
+    if (!changedAvatar) {
+    throw HttpError(404, "Not found");
+    }
+  res.json({
+      avatarURL,
+    });
+};
+
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
   changeUserSubscription: ctrlWrapper(changeUserSubscription),
+  changeUserAvatar: ctrlWrapper(changeUserAvatar),
 };
