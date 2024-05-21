@@ -13,6 +13,6 @@ export const comparePassword = async (password, hashPassword) => bcryptjs.compar
 
 export const saveToken = (filter, data) => User.findOneAndUpdate(filter, data)
 
-export const changeSubscription = async (filter, data) => User.findOneAndUpdate(filter, data)
+export const updateUser = async (filter, data) => User.findOneAndUpdate(filter, data)
     
 export const changeAvatar = async (filter, data) => User.findOneAndUpdate(filter, {...data})

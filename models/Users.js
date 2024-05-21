@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose"
 import {handleSaveError, setUpdateSetting} from "./hooks.js"
 import {emailFormat} from "../constants/user-constants.js"
+import { nanoid } from "nanoid";
 
 const userSchema = new Schema({
   password: {
@@ -23,6 +24,13 @@ const userSchema = new Schema({
     default: null,
   },
   avatarURL: {
+    type: String,
+  },
+  verify: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: {
     type: String,
   },
 }, { versionKey: false, timestamps: true });
