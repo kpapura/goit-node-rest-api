@@ -3,7 +3,7 @@ import bcryptjs from "bcryptjs"
 
 export const findUser = filter => User.findOne(filter)
 
-export const signup = async(data) => {
+export const signup = async (data) => {
     const { password } = data;
     const hashPassword = await bcryptjs.hash(password,10);
     return User.create({...data, password: hashPassword});
@@ -15,3 +15,4 @@ export const saveToken = (filter, data) => User.findOneAndUpdate(filter, data)
 
 export const changeSubscription = async (filter, data) => User.findOneAndUpdate(filter, data)
     
+export const changeAvatar = async (filter, data) => User.findOneAndUpdate(filter, {...data})
